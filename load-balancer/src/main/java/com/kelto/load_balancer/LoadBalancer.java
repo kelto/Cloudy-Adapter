@@ -11,5 +11,4 @@ public class LoadBalancer {
         cloudyClient = new CloudyClient();
     }
 
-
 }

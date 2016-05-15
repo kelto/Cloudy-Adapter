@@ -29,7 +29,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.load_balancer.LoadBalancer</mainClass>
+                            <mainClass>com.kelto.server.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -43,7 +43,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.server.Server</mainClass>
+                            <mainClass>com.kelto.load_balancer.CloudyClient</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
