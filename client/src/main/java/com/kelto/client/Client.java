@@ -4,7 +4,12 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
+import org.apache.xmlrpc.server.PropertyHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcServer;
+import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
+import org.apache.xmlrpc.webserver.WebServer;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -13,69 +18,36 @@ import java.util.logging.Logger;
 /**
  * @author Charles Fallourd on 25/03/16.
  */
-public class Client implements Runnable {
+public class Client {
 
     private static Logger LOGGER = Logger.getLogger(Client.class.getName());
-    private int requestPerSecond;
-    private XmlRpcClient client;
     public static final String PROTOCOLE = "http";
-    private boolean running;
 
-    public Client(XmlRpcClient client, int requestPerSecond) {
-        this.client = client;
-        this.requestPerSecond = requestPerSecond;
-        running = true;
-    }
 
-    public void run() {
-        while (running) {
-            // copy value, in case of user update
-            int localRequestPerSecond = requestPerSecond;
-            long startTime = System.nanoTime();
-            for(int i = 0 ; i < localRequestPerSecond; ++i) {
-                sendRequest();
-            }
-            sleep(startTime);
+
+    public static void main(String args[]) throws IOException, XmlRpcException {
+        if(args.length < 4) {
+            LOGGER.log(Level.SEVERE, "Need 4 arguments for the program to run.");
+            System.exit(-1);
         }
+        System.out.println("Args0: " +  args[0]);
+        Integer listeningPort = Integer.valueOf(args[0]);
+        Integer nbRequest = Integer.valueOf(args[1]);
+        start(createClient(args[2], args[3]), nbRequest);
+        createServer(listeningPort);
     }
 
-    private void sleep(long startTime) {
-        long elapsedTime = System.nanoTime() - startTime;
-        try {
-            Thread.sleep(elapsedTime > 0 ? elapsedTime : 0);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, "Could not make the thread sleep, the number of request per second will be wrong", e);
-        }
+    public static void start(XmlRpcClient client, int nbRequest) {
+        RequestSender.getInstance().setClient(client);
+        RequestSender.getInstance().setRequestPerSecond(nbRequest);
+        new Thread(RequestSender.getInstance()).start();
     }
 
-    public void sendRequest() {
-        // make the a regular call
-        Object[] params = new Object[]
-                {new Integer(100), new Integer(3)};
-        try {
-            Object[] result = (Object[]) client.execute("Dispatcher.dispatch", new Integer[]{100});
-            LOGGER.log(Level.INFO,"Results received.");
-            for (Object d : result) {
-                LOGGER.log(Level.INFO, "Result: ",d);
-            }
-        } catch (XmlRpcException e) {
-            LOGGER.log(Level.SEVERE, "Could not execute request",e);
-        }
-    }
-
-    public void setRequestPerSecond(int number) {
-        this.requestPerSecond = number;
-    }
-
-    public void stop() {
-        this.running = false;
-    }
-
-    public static void main(String args[]) throws MalformedURLException {
-        Integer port = Integer.valueOf(args[0]);
+    public static XmlRpcClient createClient(String host, String port) throws MalformedURLException {
+        Integer dispatcherPort = Integer.valueOf(port);
         // create configuration
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(new URL(PROTOCOLE,"127.0.0.1",port,""));
+        config.setServerURL(new URL(PROTOCOLE,host,dispatcherPort,""));
         config.setEnabledForExtensions(true);
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
@@ -88,12 +60,27 @@ public class Client implements Runnable {
         // set configuration
         client.setConfig(config);
 
+        return client;
+    }
+    public static WebServer createServer(int port) throws IOException, XmlRpcException {
+        WebServer webServer = new WebServer(port);
 
-        // make a call using dynamic proxy
-	  /*          ClientFactory factory = new ClientFactory(client);
-          Adder adder = (Adder) factory.newInstance(Adder.class);
-          int sum = adder.add(2, 4);
-          System.out.println("2 + 4 = " + sum);
-	  */
+        XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
+
+        PropertyHandlerMapping phm = new PropertyHandlerMapping();
+        phm.load(Thread.currentThread().getContextClassLoader(),
+                "XmlRpcServlet.properties");
+        xmlRpcServer.setHandlerMapping(phm);
+        XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
+
+        serverConfig.setEnabledForExtensions(true);
+        serverConfig.setContentLengthOptional(false);
+
+        webServer.start();
+        return webServer;
+    }
+
+    public static void updateNumberRequest(int number) {
+        RequestSender.getInstance().setRequestPerSecond(number);
     }
 }

@@ -3,24 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.kelto</groupId>
+    <artifactId>client-updater</artifactId>
+    <version>0.1</version>
+    <packaging>jar</packaging>
     <parent>
         <groupId>com.kelto</groupId>
         <artifactId>cloudy</artifactId>
         <version>0.1</version>
     </parent>
-    <version>0.1</version>
-    <groupId>com.kelto</groupId>
-    <artifactId>load-balancer</artifactId>
-    <packaging>jar</packaging>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.pacesys</groupId>
-            <artifactId>openstack4j</artifactId>
-            <version>2.11</version>
-        </dependency>
-    </dependencies>
-     <build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -29,7 +22,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.load_balancer.LoadBalancer</mainClass>
+                            <mainClass>com.kelto.server.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -43,7 +36,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.server.Server</mainClass>
+                            <mainClass>com.kelto.client_updater.ClientUpdater</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -56,6 +49,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
             </plugin>
         </plugins>
         <finalName>${project.artifactId}</finalName>

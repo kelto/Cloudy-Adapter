@@ -14,6 +14,7 @@
         <module>client</module>
         <module>updater</module>
         <module>load-balancer</module>
+        <module>client-updater</module>
     </modules>
 <dependencies>
     <dependency>
