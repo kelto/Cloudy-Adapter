@@ -1,7 +1,7 @@
 package com.kelto.dispatcher;
 
-import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author Charles Fallourd on 25/03/16.
@@ -10,7 +10,7 @@ public class ServerDirectory {
     private static final ServerDirectory instance = new ServerDirectory();
     public Queue<MappedServer> mappedServers;
     private ServerDirectory() {
-        mappedServers = new PriorityQueue<>();
+        mappedServers = new ConcurrentLinkedQueue<>();
     }
 
     public static ServerDirectory getInstance() {
@@ -39,12 +39,14 @@ public class ServerDirectory {
         return true;
     }
 
+    /**
+     * Could be used if any load information was properly handled, which is not the case for the moment.
+     * Should not be used, as it leads the user to think the server sent back is the least busy one,
+     * which is statistically true, but not always the case.
+     */
+    @Deprecated
     public MappedServer getLeastBusy() {
         return this.mappedServers.poll();
     }
-    /*
-    public float getMaxLoad() {
-        return this.mappedServers.
-    }
-    */
+
 }

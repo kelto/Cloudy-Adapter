@@ -13,6 +13,7 @@
         <module>dispatcher</module>
         <module>client</module>
         <module>updater</module>
+        <module>load-balancer</module>
     </modules>
 <dependencies>
     <dependency>
