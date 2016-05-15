@@ -22,6 +22,7 @@ public class MappedServer implements Comparable<MappedServer>{
     private static final String PROTOCOLE = "http";
     private static final String METHOD = "Calculator.getDivisors";
     private XmlRpcClient client;
+
     public MappedServer(String host, Integer port) {
         this.host = host;
         this.port = port;
@@ -41,6 +42,9 @@ public class MappedServer implements Comparable<MappedServer>{
                     new XmlRpcCommonsTransportFactory(client));
             // set configuration
             client.setConfig(config);
+
+            LOGGER.log(Level.INFO,"Xml rpc client successfuly connected to server calculator.");
+
         } catch (MalformedURLException e) {
             LOGGER.log(Level.SEVERE,"Invalid URL, could not map Server",e);
         }

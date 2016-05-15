@@ -40,7 +40,7 @@ public class Updater {
 
     private static void removeServer(XmlRpcClient client, String serverHost, Integer serverPort) {
         try {
-            client.execute("ServerDirectory.del",new Object[] {serverHost, serverPort});
+            client.execute("ServerMapper.del",new Object[] {serverHost, serverPort});
         } catch (XmlRpcException e) {
             System.err.println("could not remove server, reason: " + e.getMessage());
             System.exit(1);
@@ -73,7 +73,7 @@ public class Updater {
     private static void addServer(XmlRpcClient client, String serverHost, Integer serverPort) {
 
         try {
-            client.execute("ServerDirectory.add", new Object[] {serverHost,serverPort});
+            client.execute("ServerMapper.add", new Object[] {serverHost,serverPort});
         } catch (XmlRpcException e) {
             System.err.println("could not add server, reason: " + e.getMessage());
             System.exit(1);

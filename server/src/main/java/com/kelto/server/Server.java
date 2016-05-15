@@ -7,12 +7,16 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server {
 
-    public static final int port = 19000;
+    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+
 
     public static void main(String args[]) throws IOException, XmlRpcException {
+        Integer port = Integer.valueOf(args[0]);
         WebServer webServer = new WebServer(port);
 
         XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
@@ -40,6 +44,6 @@ public class Server {
         serverConfig.setContentLengthOptional(false);
 
         webServer.start();
-        System.out.println("Hello World");
+        LOGGER.log(Level.INFO,"Calculator successfuly launched");
     }
 }
