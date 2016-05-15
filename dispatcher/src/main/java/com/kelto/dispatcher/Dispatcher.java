@@ -15,8 +15,6 @@ public class Dispatcher {
         LOGGER.log(Level.INFO,"Request received from client");
         LOGGER.log(Level.INFO,"First integer to get divisors : " + params);
 
-        MappedServer mappedServer = ServerDirectory.getInstance().getMappedServers().poll();
-        ServerDirectory.getInstance().add(mappedServer);
-        return mappedServer.sendRequest(new Object[]{params});
+        return ServerDirectory.getInstance().next().sendRequest(new Object[]{params});
     }
 }

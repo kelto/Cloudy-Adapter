@@ -13,13 +13,12 @@ import java.util.logging.Logger;
 /**
  * @author Charles Fallourd on 25/03/16.
  */
-public class MappedServer implements Comparable<MappedServer>{
+public class MappedServer {
     private static final Logger LOGGER = Logger.getLogger(MappedServer.class.getName());
 
     private final Integer port;
     private final String host;
-    private float load;
-    private static final String PROTOCOLE = "http";
+    private static final String PROTOCOL = "http";
     private static final String METHOD = "Calculator.getDivisors";
     private XmlRpcClient client;
 
@@ -29,7 +28,7 @@ public class MappedServer implements Comparable<MappedServer>{
         try {
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
-            config.setServerURL(new URL(PROTOCOLE,"127.0.0.1",port,""));
+            config.setServerURL(new URL(PROTOCOL,"127.0.0.1",port,""));
 
             config.setEnabledForExtensions(true);
             config.setConnectionTimeout(60 * 1000);
@@ -43,7 +42,7 @@ public class MappedServer implements Comparable<MappedServer>{
             // set configuration
             client.setConfig(config);
 
-            LOGGER.log(Level.INFO,"Xml rpc client successfuly connected to server calculator.");
+            LOGGER.log(Level.INFO,"Xml rpc client successfully connected to server calculator.");
 
         } catch (MalformedURLException e) {
             LOGGER.log(Level.SEVERE,"Invalid URL, could not map Server",e);
@@ -68,11 +67,6 @@ public class MappedServer implements Comparable<MappedServer>{
         int result = port.hashCode();
         result = 31 * result + host.hashCode();
         return result;
-    }
-
-    @Override
-    public int compareTo(MappedServer mappedServer) {
-        return Float.compare(this.load,mappedServer.load);
     }
 
     //TODO: use a params as a way to specify the request (Class.method)

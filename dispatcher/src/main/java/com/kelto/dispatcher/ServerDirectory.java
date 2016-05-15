@@ -26,8 +26,10 @@ public class ServerDirectory {
         return this.mappedServers.remove(new MappedServer(host,port));
     }
 
-    public Queue<MappedServer> getMappedServers() {
-        return this.mappedServers;
+    public synchronized MappedServer next() {
+        MappedServer mappedServer = this.mappedServers.poll();
+        this.mappedServers.add(mappedServer);
+        return mappedServer;
     }
 
     public boolean add(MappedServer mappedServer) {
@@ -37,16 +39,6 @@ public class ServerDirectory {
         }
         this.mappedServers.add(mappedServer);
         return true;
-    }
-
-    /**
-     * Could be used if any load information was properly handled, which is not the case for the moment.
-     * Should not be used, as it leads the user to think the server sent back is the least busy one,
-     * which is statistically true, but not always the case.
-     */
-    @Deprecated
-    public MappedServer getLeastBusy() {
-        return this.mappedServers.poll();
     }
 
 }
