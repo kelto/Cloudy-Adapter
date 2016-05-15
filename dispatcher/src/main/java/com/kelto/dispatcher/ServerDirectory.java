@@ -10,7 +10,7 @@ public class ServerDirectory {
     private static final ServerDirectory instance = new ServerDirectory();
     public Queue<MappedServer> mappedServers;
     private ServerDirectory() {
-        mappedServers = new ConcurrentLinkedQueue<>();
+        mappedServers = new ConcurrentLinkedQueue<MappedServer>();
     }
 
     public static ServerDirectory getInstance() {

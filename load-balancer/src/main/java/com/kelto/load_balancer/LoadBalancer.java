@@ -4,6 +4,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
+import org.openstack4j.model.compute.Server;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,10 +37,7 @@ public class LoadBalancer implements Runnable {
             try {
                 Integer load = (Integer) client.execute("ServerDirectory.getLoad",new Object[0]);
                 if( load > MAX_LOAD ) {
-                    boolean res = cloudyClient.addServer();
-                    if(!res) {
-                        LOGGER.log(Level.SEVERE, "Could not add a new Virtual Machine");
-                    }
+                    Server server = cloudyClient.addServer();
                 } else if ( load < MIN_LOAD ) {
                     //stop a VM
                 }
@@ -75,5 +73,4 @@ public class LoadBalancer implements Runnable {
 
         return client;
     }
-
 }
