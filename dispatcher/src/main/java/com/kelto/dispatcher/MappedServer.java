@@ -21,6 +21,7 @@ public class MappedServer {
     private static final String PROTOCOL = "http";
     private static final String METHOD = "Calculator.getDivisors";
     private XmlRpcClient client;
+    private int load;
 
     public MappedServer(String host, Integer port) {
         this.host = host;
@@ -57,8 +58,7 @@ public class MappedServer {
 
         MappedServer that = (MappedServer) o;
 
-        if (!port.equals(that.port)) return false;
-        return host.equals(that.host);
+        return port.equals(that.port) && host.equals(that.host);
 
     }
 
@@ -71,11 +71,26 @@ public class MappedServer {
 
     //TODO: use a params as a way to specify the request (Class.method)
     public Object sendRequest(Object[] params) {
+        Object res = null;
+        newRequest();
         try {
-            return client.execute(METHOD,params);
+            res = client.execute(METHOD,params);
         } catch (XmlRpcException e) {
             LOGGER.log(Level.SEVERE,"Could not execute method on mapped server",e);
-            return null;
         }
+        endRequest();
+        return res;
+    }
+
+    private synchronized void endRequest() {
+        this.load--;
+    }
+
+    private synchronized void newRequest() {
+        this.load++;
+    }
+
+    public int getLoad() {
+        return load;
     }
 }

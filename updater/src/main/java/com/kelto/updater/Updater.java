@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class Updater {
 
-    private static final String PROTOCOLE = "http";
+    private static final String PROTOCOL = "http";
 
     //TODO: should split logic in a new class, the main method should only instantiate it.
     public static void main(String args[]) throws MalformedURLException, XmlRpcException {
@@ -52,7 +52,7 @@ public class Updater {
         // create configuration
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try {
-            config.setServerURL(new URL(PROTOCOLE,dispatcherHost,dispatcherPort,""));
+            config.setServerURL(new URL(PROTOCOL,dispatcherHost,dispatcherPort,""));
         } catch (MalformedURLException e) {
             System.err.println("Invalid URL produced from arguments: "+e.getMessage());
         }

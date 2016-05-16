@@ -17,13 +17,13 @@ public class ServerDirectory {
         return instance;
     }
 
-    public boolean add(String host, Integer port) {
+    public static boolean add(String host, Integer port) {
         MappedServer mappedServer = new MappedServer(host,port);
-        return add(mappedServer);
+        return getInstance().add(mappedServer);
     }
 
-    public boolean del(String host, Integer port) {
-        return this.mappedServers.remove(new MappedServer(host,port));
+    public static boolean del(String host, Integer port) {
+        return getInstance().mappedServers.remove(new MappedServer(host,port));
     }
 
     public synchronized MappedServer next() {
@@ -39,6 +39,10 @@ public class ServerDirectory {
         }
         this.mappedServers.add(mappedServer);
         return true;
+    }
+
+    public static Integer getLoad() {
+        return getInstance().mappedServers.peek().getLoad();
     }
 
 }

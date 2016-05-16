@@ -8,10 +8,15 @@
         <artifactId>cloudy</artifactId>
         <version>0.1</version>
     </parent>
-    <version>0.1</version>
-    <groupId>com.kelto</groupId>
     <artifactId>server</artifactId>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.kelto</groupId>
+            <artifactId>common</artifactId>
+            <version>0.1</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

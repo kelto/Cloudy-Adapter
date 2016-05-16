@@ -35,6 +35,7 @@ public class ClientUpdater {
             config.setServerURL(new URL(PROTOCOLE,host,port,""));
         } catch (MalformedURLException e) {
             System.err.println("Invalid URL produced from arguments: "+e.getMessage());
+            System.exit(-1);
         }
         config.setEnabledForExtensions(true);
         config.setConnectionTimeout(60 * 1000);
