@@ -17,6 +17,9 @@ public class Dispatcher {
         LOGGER.log(Level.INFO,"Request received from client");
         LOGGER.log(Level.INFO,"First integer to get divisors : " + params);
         final MappedServer mappedServer = ServerDirectory.getInstance().next();
+        if(mappedServer == null) {
+            return null;
+        }
         Future future = executorService.submit(new Callable() {
             @Override
             public Object call() throws Exception {

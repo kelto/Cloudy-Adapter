@@ -28,6 +28,9 @@ public class ServerDirectory {
 
     public synchronized MappedServer next() {
         MappedServer mappedServer = this.mappedServers.poll();
+        if(mappedServer == null) {
+            return null;
+        }
         this.mappedServers.add(mappedServer);
         return mappedServer;
     }
