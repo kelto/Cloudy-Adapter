@@ -73,6 +73,12 @@ public class CloudyClient {
         return server;
     }
 
+    public Server stopServer() {
+        Server server = vmLists.poll();
+        stopServer(server.getId());
+        return server;
+    }
+
     public void stopServer(String id) {
 
         if (id != null) {
