@@ -30,7 +30,7 @@ public class CloudyClient {
 
     public static final String DEFAULT_FLAVOR_ID = "3";
     public static final String PATH_TO_IMG = "/nfs/home/gdacosta/ubuntu-15.10-server-cloudimg-amd64-disk1.img";
-    public static final String IMG_ID = "0e2e6fea-82ab-4ca4-956a-30ffdf98f0a5";
+    public static final String IMG_ID = "f903d7f3-af65-4f83-a1bd-02f921d52ec2";
     public static final String SERVER_NAME = "FallourdOdegaard-VM-";
     public final static OSClient osClient;
 
