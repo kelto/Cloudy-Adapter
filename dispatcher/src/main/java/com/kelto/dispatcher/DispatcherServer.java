@@ -18,6 +18,10 @@ public class DispatcherServer {
     private static final Logger LOGGER = Logger.getLogger(DispatcherServer.class.getName());
 
     public static void main(String args[]) throws IOException, XmlRpcException {
+        if(args.length < 1) {
+            System.err.println("The port for the dispatcher must be provided");
+            System.exit(-1);
+        }
         Integer port = Integer.valueOf(args[0]);
         WebServer webServer = new WebServer(port);
 

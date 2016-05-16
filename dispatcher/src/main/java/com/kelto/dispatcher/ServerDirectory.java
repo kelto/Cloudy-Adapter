@@ -10,7 +10,7 @@ public class ServerDirectory {
     private static final ServerDirectory instance = new ServerDirectory();
     public Queue<MappedServer> mappedServers;
     private ServerDirectory() {
-        mappedServers = new ConcurrentLinkedQueue<MappedServer>();
+        mappedServers = new ConcurrentLinkedQueue<>();
     }
 
     public static ServerDirectory getInstance() {
@@ -44,8 +44,8 @@ public class ServerDirectory {
         return true;
     }
 
-    public static Integer getLoad() {
-        MappedServer mappedServer = getInstance().mappedServers.peek();
+    public Integer getLoad() {
+        MappedServer mappedServer = mappedServers.peek();
         return mappedServer == null ? -1 : mappedServer.getLoad();
     }
 

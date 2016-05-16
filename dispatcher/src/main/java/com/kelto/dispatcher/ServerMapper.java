@@ -10,16 +10,16 @@ public class ServerMapper {
 
     private static final Logger LOGGER = Logger.getLogger(ServerMapper.class.getName());
 
-    public boolean add(String host, Integer port) {
+    public boolean add(String host, String port) {
 
         LOGGER.log(Level.INFO,"Request to ServerMapper : add");
         LOGGER.log(Level.INFO,"Port : " + port);
         LOGGER.log(Level.INFO,"Host : " + host);
-        return ServerDirectory.getInstance().add(host,port);
+        return ServerDirectory.getInstance().add(host,Integer.valueOf(port));
     }
 
-    public boolean del(String host, Integer port) {
-        return ServerDirectory.getInstance().del(host,port);
+    public boolean del(String host, String port) {
+        return ServerDirectory.getInstance().del(host,Integer.valueOf(port));
     }
 
 }

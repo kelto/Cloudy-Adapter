@@ -1,6 +1,8 @@
 package com.kelto.client;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.XmlRpcRequest;
+import org.apache.xmlrpc.client.AsyncCallback;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
@@ -12,42 +14,61 @@ import org.apache.xmlrpc.webserver.WebServer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Charles Fallourd on 25/03/16.
  */
 public class Client {
 
-    private static Logger LOGGER = Logger.getLogger(Client.class.getName());
     public static final String PROTOCOLE = "http";
+    private static int numberRequest;
 
 
-
-    public static void main(String args[]) throws IOException, XmlRpcException {
-        if(args.length < 4) {
-            LOGGER.log(Level.SEVERE, "Need 4 arguments for the program to run.");
+    public static void main(final String args[]) throws IOException, XmlRpcException, InterruptedException {
+        if (args.length < 4) {
+            System.err.println("Need 4 arguments for the program to run.");
             System.exit(-1);
         }
-        System.out.println("Args0: " +  args[0]);
         Integer listeningPort = Integer.valueOf(args[0]);
-        Integer nbRequest = Integer.valueOf(args[1]);
-        start(createClient(args[2], args[3]), nbRequest);
+        numberRequest = Integer.valueOf(args[1]);
         createServer(listeningPort);
-    }
+        XmlRpcClient client = createClient(args[2], args[3]);
+        while (true) {
+            int local = numberRequest;
+            for (int i = 0; i < local; i++) {
+                try {
+                    client.executeAsync("Dispatcher.dispatch", new Integer[]{100}, new AsyncCallback() {
+                        public void handleResult(XmlRpcRequest xmlRpcRequest, Object o) {
+                            Object[] result = (Object[]) o;
+                            for (Object d : result) {
 
-    public static void start(XmlRpcClient client, int nbRequest) {
-        RequestSender.getInstance().setClient(client);
-        RequestSender.getInstance().setRequestPerSecond(nbRequest);
-        new Thread(RequestSender.getInstance()).start();
+                            }
+                        }
+
+                        public void handleError(XmlRpcRequest xmlRpcRequest, Throwable throwable) {
+
+                        }
+                    });
+
+
+                } catch (XmlRpcException e) {
+                            System.err.println("Could not execute request: "+e.toString());
+                }
+
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.err.println("Failed to put thread to sleep: " + e);
+            }
+        }
     }
 
     public static XmlRpcClient createClient(String host, String port) throws MalformedURLException {
         Integer dispatcherPort = Integer.valueOf(port);
         // create configuration
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(new URL(PROTOCOLE,host,dispatcherPort,""));
+        config.setServerURL(new URL(PROTOCOLE, host, dispatcherPort, ""));
         config.setEnabledForExtensions(true);
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
@@ -62,6 +83,7 @@ public class Client {
 
         return client;
     }
+
     public static WebServer createServer(int port) throws IOException, XmlRpcException {
         WebServer webServer = new WebServer(port);
 
@@ -81,6 +103,6 @@ public class Client {
     }
 
     public static void updateNumberRequest(int number) {
-        RequestSender.getInstance().setRequestPerSecond(number);
+        numberRequest = number;
     }
 }

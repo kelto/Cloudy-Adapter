@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.load_balancer.CloudyClient</mainClass>
+                            <mainClass>com.kelto.load_balancer.LoadBalancer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -47,7 +47,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.kelto.load_balancer.CloudyClient</mainClass>
+                            <mainClass>com.kelto.load_balancer.LoadBalancer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -60,6 +60,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
             </plugin>
         </plugins>
         <finalName>${project.artifactId}</finalName>

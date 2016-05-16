@@ -10,12 +10,15 @@ import org.openstack4j.model.network.NetFloatingIP;
 import org.openstack4j.openstack.OSFactory;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Charles Fallourd on 22/04/16.
  */
 public class CloudyClient {
 
+    private static final Logger LOGGER = Logger.getLogger(CloudyClient.class.getName());
 
     public static final String END_POINT = "http://127.0.0.1:5000/v2.0";
     //c'est le nom du groupe ... selon le prof.
@@ -25,16 +28,16 @@ public class CloudyClient {
 
     public static final String DEFAULT_FLAVOR_ID = "3";
     public static final String PATH_TO_IMG = "/nfs/home/gdacosta/ubuntu-15.10-server-cloudimg-amd64-disk1.img";
-    public static final String IMG_ID = "0e2e6fea-82ab-4ca4-956a-30ffdf98f0a5";
+    public static final String IMG_ID = "f903d7f3-af65-4f83-a1bd-02f921d52ec2";
     public static final String SERVER_NAME = "FallourdOdegaard-VM-";
     public final static OSClient osClient;
 
-    private Queue<Server> vmLists;
+    private Queue<VirtualMachine> vmLists;
     private int count;
     private org.openstack4j.model.compute.ActionResponse ActionResponse;
 
     public CloudyClient() {
-        vmLists = new LinkedList<Server>();
+        vmLists = new LinkedList<>();
         count = 1;
     }
 
@@ -42,7 +45,7 @@ public class CloudyClient {
         osClient = OSFactory.builder().endpoint(END_POINT).credentials(LOGIN,PASSWORD).tenantName(TENANT_NAME).authenticate();
     }
 
-    public Server addServer() {
+    public VirtualMachine addServer() {
 
         // Add netork id of cloudmip
         List<String> networks = new ArrayList<String>();
@@ -58,8 +61,12 @@ public class CloudyClient {
         // Boot the Server
         Server server = osClient.compute().servers().boot(sc);
 
-        // add the server to the list of vm currently working
-        vmLists.add(server);
+        System.out.println("Waiting 2 second for the server to boot properly");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            System.out.println("Could not sleep");
+        }
 
         // Associate public key to instance
         List<String> pools = osClient.compute().floatingIps().getPoolNames();
@@ -68,13 +75,16 @@ public class CloudyClient {
         NetFloatingIP netFloatingIP = osClient.networking().floatingip().get(ip.getId());
         System.out.println("NetFloatingIP : " + netFloatingIP.getFloatingIpAddress());
         ActionResponse = osClient.compute().floatingIps().addFloatingIP(server, netFloatingIP.getFloatingIpAddress());
-
+        System.out.println("ActionResponse: ");
+        System.out.println(ActionResponse);
+        VirtualMachine virtualMachine = new VirtualMachine(netFloatingIP.getFloatingIpAddress(), server.getId());
         count++;
-        return server;
+        vmLists.add(virtualMachine);
+        return virtualMachine;
     }
 
-    public Server stopServer() {
-        Server server = vmLists.poll();
+    public VirtualMachine stopServer() {
+        VirtualMachine server = vmLists.poll();
         stopServer(server.getId());
         return server;
     }
@@ -89,6 +99,24 @@ public class CloudyClient {
         }
     }
 
+    public void cleanCloudMip() {
+        LOGGER.log(Level.INFO,"Cleaning servers ...");
+        List<? extends Server> servers = osClient.compute().servers().list();
+        for(Server server : servers) {
+            if(server.getName().startsWith(SERVER_NAME)) {
+                osClient.compute().servers().delete(server.getId());
+                LOGGER.log(Level.INFO,server.getName() + " has been deleted");
+            }
+        }
+        List<? extends NetFloatingIP> listIp = osClient.networking().floatingip().list();
+        for(NetFloatingIP floatingIP : listIp) {
+            if(floatingIP.getFixedIpAddress() == null || floatingIP.getFixedIpAddress().isEmpty()) {
+                osClient.networking().floatingip().delete(floatingIP.getId());
+                LOGGER.log(Level.INFO, String.format("Floating ip [%s] with addresse %s has been deleted", floatingIP.getId(),floatingIP.getFloatingIpAddress()));
+            }
+        }
+    }
+
     public int numberOfVm() {
         return vmLists.size();
     }
@@ -99,9 +127,10 @@ public class CloudyClient {
 
         CloudyClient cl = new CloudyClient();
         System.out.println("Start cloudy client");
-
+        LOGGER.log(Level.INFO,"Cleaning all instance and floatingip");
+        cl.cleanCloudMip();
         System.out.println("Launching a vm ...");
-        cl.addServer();
+        VirtualMachine server = cl.addServer();
         System.out.println("VM created");
 
         /*System.out.println("Sleep ...");

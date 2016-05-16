@@ -29,7 +29,7 @@ public class MappedServer {
         try {
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
-            config.setServerURL(new URL(PROTOCOL,"127.0.0.1",port,""));
+            config.setServerURL(new URL(PROTOCOL,host,port,""));
 
             config.setEnabledForExtensions(true);
             config.setConnectionTimeout(60 * 1000);

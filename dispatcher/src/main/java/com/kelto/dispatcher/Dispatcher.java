@@ -29,4 +29,8 @@ public class Dispatcher {
         LOGGER.log(Level.INFO,"load: " + mappedServer.getLoad());
         return future.get();
     }
+
+    public Integer getLoad() {
+        return ServerDirectory.getInstance().getLoad();
+    }
 }

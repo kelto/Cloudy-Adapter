@@ -4,7 +4,6 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
-import org.openstack4j.model.compute.Server;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -15,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * @author Charles Fallourd on 15/04/16.
  */
-public class LoadBalancer implements Runnable {
+public class LoadBalancer {
 
     public static final int MAX_LOAD = 80;
     private static final Integer MIN_LOAD = 20;
@@ -35,22 +34,24 @@ public class LoadBalancer implements Runnable {
 
     public void run() {
         running = true;
+        LOGGER.log(Level.INFO,"Cleaning cloudmip ...");
+        cloudyClient.cleanCloudMip();
         while (running) {
             try {
-                Integer load = (Integer) client.execute("ServerDirectory.getLoad",new Object[0]);
+                Integer load = (Integer) client.execute("Dispatcher.getLoad",new Object[0]);
                 LOGGER.log(Level.INFO, "Load received from ServerDirectory: " + load);
                 if (load == -1 ) {
                     LOGGER.log(Level.INFO, "The load indicate that no server is present, adding new VM");
-                    Server server = cloudyClient.addServer();
+                    VirtualMachine server = cloudyClient.addServer();
                     addServerToDispatcher(server);
                 }
                 else if( load > MAX_LOAD ) {
                     LOGGER.log(Level.INFO,"Load greater than the maximum setted, adding new VM");
-                    Server server = cloudyClient.addServer();
+                    VirtualMachine server = cloudyClient.addServer();
                     addServerToDispatcher(server);
                 } else if ( load < MIN_LOAD  && cloudyClient.numberOfVm() > 1) {
                     LOGGER.log(Level.INFO,"Load inferior to the minimum setted, removing a VM");
-                    Server server = cloudyClient.stopServer();
+                    VirtualMachine server = cloudyClient.stopServer();
                     removeServerToDispatcher(server);
                 } else {
                     LOGGER.log(Level.INFO,"Acceptable load, going to sleep");
@@ -64,17 +65,17 @@ public class LoadBalancer implements Runnable {
         }
     }
 
-    private void addServerToDispatcher(Server server) {
+    private void addServerToDispatcher(VirtualMachine server) {
         try {
-            client.execute("ServerMapper.add", new Object[] {server.getAccessIPv4(), DEFAULT_SERVER_PORT});
+            client.execute("ServerMapper.add", new Object[] {server.getHost(), DEFAULT_SERVER_PORT});
         } catch (XmlRpcException e) {
             LOGGER.log(Level.SEVERE, "Could not add Server to dispatcher",e);
         }
     }
 
-    private void removeServerToDispatcher(Server server) {
+    private void removeServerToDispatcher(VirtualMachine server) {
         try {
-            client.execute("ServerMapper.del", new Object[] {server.getAccessIPv4(), DEFAULT_SERVER_PORT});
+            client.execute("ServerMapper.del", new Object[] {server.getHost(), DEFAULT_SERVER_PORT});
         } catch (XmlRpcException e) {
             LOGGER.log(Level.SEVERE, "Could not remove Server from dispatcher",e);
         }
@@ -111,11 +112,6 @@ public class LoadBalancer implements Runnable {
         }
         Integer dispatcherPort = Integer.valueOf(args[1]);
         LoadBalancer loadBalancer = new LoadBalancer(args[0], dispatcherPort);
-        Thread thread = new Thread(loadBalancer);
-        thread.start();
-        System.out.println("Press enter to stop the load balancer");
-        System.in.read();
-        loadBalancer.stop();
-        thread.join();
+        loadBalancer.run();
     }
 }
