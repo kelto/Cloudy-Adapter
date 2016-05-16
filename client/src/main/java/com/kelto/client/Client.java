@@ -70,6 +70,7 @@ public class Client {
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL(PROTOCOLE, host, dispatcherPort, ""));
         config.setEnabledForExtensions(true);
+        config.setEnabledForExceptions(true);
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
 

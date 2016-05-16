@@ -22,6 +22,7 @@ public class MappedServer {
     private static final String METHOD = "Calculator.getDivisors";
     private XmlRpcClient client;
     private int load;
+    private static final int LOAD_PER_REQUEST = 20;
 
     public MappedServer(String host, Integer port) {
         this.host = host;
@@ -32,6 +33,7 @@ public class MappedServer {
             config.setServerURL(new URL(PROTOCOL,host,port,""));
 
             config.setEnabledForExtensions(true);
+            config.setEnabledForExceptions(true);
             config.setConnectionTimeout(60 * 1000);
             config.setReplyTimeout(60 * 1000);
 
@@ -83,11 +85,11 @@ public class MappedServer {
     }
 
     private synchronized void endRequest() {
-        this.load--;
+        this.load-=LOAD_PER_REQUEST;
     }
 
     private synchronized void newRequest() {
-        this.load++;
+        this.load += LOAD_PER_REQUEST;
     }
 
     public int getLoad() {

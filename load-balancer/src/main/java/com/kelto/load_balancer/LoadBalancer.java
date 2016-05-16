@@ -91,6 +91,7 @@ public class LoadBalancer {
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL(PROTOCOL,host, port,""));
         config.setEnabledForExtensions(true);
+        config.setEnabledForExceptions(true);
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
 
