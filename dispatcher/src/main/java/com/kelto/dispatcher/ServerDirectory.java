@@ -42,7 +42,8 @@ public class ServerDirectory {
     }
 
     public static Integer getLoad() {
-        return getInstance().mappedServers.peek().getLoad();
+        MappedServer mappedServer = getInstance().mappedServers.peek();
+        return mappedServer == null ? -1 : mappedServer.getLoad();
     }
 
 }
