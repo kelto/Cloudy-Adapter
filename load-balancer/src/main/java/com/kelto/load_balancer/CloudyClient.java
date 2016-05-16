@@ -89,6 +89,10 @@ public class CloudyClient {
         }
     }
 
+    public int numberOfVm() {
+        return vmLists.size();
+    }
+
 
 
     public static void main(String args[]) throws InterruptedException {

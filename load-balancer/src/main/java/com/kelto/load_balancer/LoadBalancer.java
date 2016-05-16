@@ -48,7 +48,7 @@ public class LoadBalancer implements Runnable {
                     LOGGER.log(Level.INFO,"Load greater than the maximum setted, adding new VM");
                     Server server = cloudyClient.addServer();
                     addServerToDispatcher(server);
-                } else if ( load < MIN_LOAD ) {
+                } else if ( load < MIN_LOAD  && cloudyClient.numberOfVm() > 1) {
                     LOGGER.log(Level.INFO,"Load inferior to the minimum setted, removing a VM");
                     Server server = cloudyClient.stopServer();
                     removeServerToDispatcher(server);
